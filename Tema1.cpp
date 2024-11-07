@@ -1,4 +1,5 @@
 #include "lab_m1/Tema1/Tema1.h"
+#include "lab_m1/Tema1/Tank.h"
 
 #include <vector>
 #include <iostream>
@@ -6,16 +7,10 @@
 
 #include "lab_m1/lab3/transform2D.h"
 #include "lab_m1/lab3/object2D.h"
+#include "../../../build/Tank.h"
 
 using namespace std;
 using namespace m1;
-
-
-/*
- *  To find out more about `FrameStart`, `Update`, `FrameEnd`
- *  and the order in which they are called, see `world.cpp`.
- */
-
 
 Tema1::Tema1()
 {
@@ -32,7 +27,6 @@ std::vector<float> GenerateHeightMap(int numPoints, float amplitude1, float freq
 
     for (int i = 0; i < numPoints; ++i) {
         float x = xStart + i * step;
-        // Aplica?i deplasarea vertical? pentru a ridica linia orizontului
         heightMap[i] = verticalOffset + amplitude1 * sin(frequency1 * x) + amplitude2 * sin(frequency2 * x);
     }
 
@@ -51,12 +45,11 @@ void Tema1::Init() {
     float xStart = 0;
     float xEnd = (float)resolution.x;
 
-    // Ajustare amplitudine, frecven?? ?i deplasare vertical? pentru un teren mai întins
-    float amplitude1 = 20;      // Dealuri mai line
-    float frequency1 = 0.02f;   // Frecven?? joas? pentru dealuri mai largi
-    float amplitude2 = 10;      // Valoare mic? pentru varia?ii subtile
+    float amplitude1 = 20;
+    float frequency1 = 0.02f;
+    float amplitude2 = 10;
     float frequency2 = 0.05f;
-    float verticalOffset = 150; // Ridic? terenul în sus pe ecran
+    float verticalOffset = 150;
 
     std::vector<float> heightMap = GenerateHeightMap(numPoints, amplitude1, frequency1, amplitude2, frequency2, xStart, xEnd, verticalOffset);
 
@@ -67,9 +60,8 @@ void Tema1::Init() {
         float x = xStart + i * ((xEnd - xStart) / (numPoints - 1));
         float y = heightMap[i];
 
-        // Partea verde a terenului
-        vertices.emplace_back(glm::vec3(x, y, 0), glm::vec3(0.3f, 0.6f, 0.2f));  // Verde închis pentru teren
-        vertices.emplace_back(glm::vec3(x, 0, 0), glm::vec3(0.3f, 0.6f, 0.2f));  // Verde pentru partea de jos
+        vertices.emplace_back(glm::vec3(x, y, 0), glm::vec3(0.3f, 0.6f, 0.2f));
+        vertices.emplace_back(glm::vec3(x, 0, 0), glm::vec3(0.3f, 0.6f, 0.2f));
 
         if (i > 0) {
             indices.push_back(2 * i - 2);
@@ -83,79 +75,90 @@ void Tema1::Init() {
     terrainMesh->InitFromData(vertices, indices);
     terrainMesh->SetDrawMode(GL_TRIANGLE_STRIP);
     AddMeshToList(terrainMesh);
+
+    // Ini?ializarea tancurilor
+    std::vector<Mesh*> tank1Meshes;
+    std::vector<Mesh*> tank2Meshes;
+
+
+    glm::vec3 camoBeigeDark = glm::vec3(0.76f, 0.69f, 0.50f);  // A shade of beige
+    glm::vec3 camoGreenDark = glm::vec3(0.33f, 0.42f, 0.18f);  // A shade of green
+
+    // Creeaz? primul tanc (albastru)
+    object2D::CreateTank("tank1",  camoBeigeDark, camoBeigeDark, tank1Meshes);
+    for (auto& mesh : tank1Meshes) {
+        AddMeshToList(mesh);
+    }
+
+    // Creeaz? al doilea tanc (ro?u)
+    object2D::CreateTank("tank2", camoGreenDark, camoGreenDark, tank2Meshes);
+    for (auto& mesh : tank2Meshes) {
+        AddMeshToList(mesh);
+    }
 }
 
-
-
-void Tema1::FrameStart()
-{
-    // Clears the color buffer (using the previously set color) and depth buffer
+void Tema1::FrameStart() {
     glClearColor(0, 1, 1, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glm::ivec2 resolution = window->GetResolution();
-    // Sets the screen area where to draw
     glViewport(0, 0, resolution.x, resolution.y);
 }
-
 
 void Tema1::Update(float deltaTimeSeconds) {
     modelMatrix = glm::mat3(1);
     RenderMesh2D(meshes["terrain"], shaders["VertexColor"], modelMatrix);
+
+    // Pozi?ionare ?i redare pentru primul tanc
+    glm::mat3 tank1ModelMatrix = glm::mat3(1);
+    tank1ModelMatrix *= transform2D::Translate(100, 200);
+    RenderMesh2D(meshes["tank1_base"], shaders["VertexColor"], tank1ModelMatrix);
+    RenderMesh2D(meshes["tank1_turret"], shaders["VertexColor"], tank1ModelMatrix);
+    RenderMesh2D(meshes["tank1_barrel"], shaders["VertexColor"], tank1ModelMatrix * transform2D::Translate(0, 20));
+
+    // Pozi?ionare ?i redare pentru al doilea tanc
+    glm::mat3 tank2ModelMatrix = glm::mat3(1);
+    tank2ModelMatrix *= transform2D::Translate(400, 200);
+    RenderMesh2D(meshes["tank2_base"], shaders["VertexColor"], tank2ModelMatrix);
+    RenderMesh2D(meshes["tank2_turret"], shaders["VertexColor"], tank2ModelMatrix);
+    RenderMesh2D(meshes["tank2_barrel"], shaders["VertexColor"], tank2ModelMatrix * transform2D::Translate(0, 20));
 }
 
-
-
-void Tema1::FrameEnd()
-{
+void Tema1::FrameEnd() {
 }
-
-
-/*
- *  These are callback functions. To find more about callbacks and
- *  how they behave, see `input_controller.h`.
- */
-
 
 void Tema1::OnInputUpdate(float deltaTime, int mods)
 {
 }
-
 
 void Tema1::OnKeyPress(int key, int mods)
 {
     // Add key press event
 }
 
-
 void Tema1::OnKeyRelease(int key, int mods)
 {
     // Add key release event
 }
-
 
 void Tema1::OnMouseMove(int mouseX, int mouseY, int deltaX, int deltaY)
 {
     // Add mouse move event
 }
 
-
 void Tema1::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods)
 {
     // Add mouse button press event
 }
-
 
 void Tema1::OnMouseBtnRelease(int mouseX, int mouseY, int button, int mods)
 {
     // Add mouse button release event
 }
 
-
 void Tema1::OnMouseScroll(int mouseX, int mouseY, int offsetX, int offsetY)
 {
 }
-
 
 void Tema1::OnWindowResize(int width, int height)
 {
