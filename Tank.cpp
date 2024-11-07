@@ -13,16 +13,16 @@ namespace object2D {
         std::vector<unsigned int> indices;
 
         // Trapez de jos (mai mic, scalat p?strând raportul dimensiunilor)
-        vertices.emplace_back(glm::vec3(-40 * 0.75, -16 * 0.75, 0), color - 0.15f);  // Stânga jos - baza mic? scalat?
-        vertices.emplace_back(glm::vec3(40 * 0.75, -16 * 0.75, 0), color - 0.15f);   // Dreapta jos - baza mic? scalat?
-        vertices.emplace_back(glm::vec3(60 * 0.75, 0 * 0.75, 0), color - 0.15f);     // Dreapta sus - baza mare scalat?
-        vertices.emplace_back(glm::vec3(-60 * 0.75, 0 * 0.75, 0), color - 0.15f);    // Stânga sus - baza mare scalat?
+        vertices.emplace_back(glm::vec3(-20 * 0.75, -8 * 0.75, 0), color - 0.15f);  // Stânga jos - baza mic? scalat?
+        vertices.emplace_back(glm::vec3(20 * 0.75, -8 * 0.75, 0), color - 0.15f);   // Dreapta jos - baza mic? scalat?
+        vertices.emplace_back(glm::vec3(30 * 0.75, 0 * 0.75, 0), color - 0.15f);     // Dreapta sus - baza mare scalat?
+        vertices.emplace_back(glm::vec3(-30 * 0.75, 0 * 0.75, 0), color - 0.15f);    // Stânga sus - baza mare scalat?
 
         // Trapez de sus (mai mare, dar p?strând raportul cu cel de jos)
-        vertices.emplace_back(glm::vec3(-89 * 0.75, 0 * 0.75, 0), color);    // Stânga jos - baza mare scalat?
-        vertices.emplace_back(glm::vec3(89 * 0.75, 0 * 0.75, 0), color);     // Dreapta jos - baza mare scalat?
-        vertices.emplace_back(glm::vec3(62 * 0.75, 35 * 0.75, 0), color);    // Dreapta sus - baza mic? scalat?
-        vertices.emplace_back(glm::vec3(-62 * 0.75, 35 * 0.75, 0), color);   // Stânga sus - baza mic? scalat?
+        vertices.emplace_back(glm::vec3(-45 * 0.75, 0 * 0.75, 0), color);    // Stânga jos - baza mare scalat?
+        vertices.emplace_back(glm::vec3(45 * 0.75, 0 * 0.75, 0), color);     // Dreapta jos - baza mare scalat?
+        vertices.emplace_back(glm::vec3(31 * 0.75, 17 * 0.75, 0), color);    // Dreapta sus - baza mic? scalat?
+        vertices.emplace_back(glm::vec3(-31 * 0.75, 17 * 0.75, 0), color);   // Stânga sus - baza mic? scalat?
 
 
 
@@ -41,9 +41,9 @@ namespace object2D {
         std::vector<unsigned int> indices;
 
         int numSegments = 30;
-        float radius = 20.0f;
+        float radius = 10.0f;
         float angleStep = M_PI / numSegments; // Arc de cerc pe jum?tate
-        float offsetY = 26.0f;  // Offset vertical pentru a plasa turela deasupra trapezului superior
+        float offsetY = 13.0f;  // Offset vertical pentru a plasa turela deasupra trapezului superior
 
         // Adaug? centrul arcului cu translatare vertical?
         vertices.emplace_back(glm::vec3(0, offsetY, 0), color);
@@ -68,10 +68,10 @@ namespace object2D {
     // Func?ie pentru ?eava tunului tancului, un dreptunghi alungit
     Mesh* CreateTankBarrel(const std::string& name, const glm::vec3& color) {
         std::vector<VertexFormat> vertices = {
-            VertexFormat(glm::vec3(-3, 0, 0), color),
-            VertexFormat(glm::vec3(3, 0, 0), color),
-            VertexFormat(glm::vec3(3, 55, 0), color),
-            VertexFormat(glm::vec3(-3,55, 0), color),
+            VertexFormat(glm::vec3(-1.5, 0, 0), color),
+            VertexFormat(glm::vec3(1.5, 0, 0), color),
+            VertexFormat(glm::vec3(1.5, 20, 0), color),
+            VertexFormat(glm::vec3(-1.5,20, 0), color),
         };
 
         std::vector<unsigned int> indices = { 0, 1, 2, 2, 3, 0 };

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "components/simple_scene.h"
-
+#include <vector>
 
 namespace m1
 {
@@ -11,13 +11,28 @@ namespace m1
         Tema1();
         ~Tema1();
 
+        // Initialization and update functions
         void Init() override;
+        void UpdateTankPosition();
 
     private:
         void FrameStart() override;
         void Update(float deltaTimeSeconds) override;
         void FrameEnd() override;
 
+        // Tank positions and movement flags
+        float xPosTank1 = 100.0f;
+        float xPosTank2 = 400.0f;
+        float xStart, xEnd;
+        bool moveTank1Right = false;
+        bool moveTank1Left = false;
+        bool moveTank2Right = false;
+        bool moveTank2Left = false;
+
+        // Height map data for terrain
+        std::vector<float> heightMap;
+
+        // Input handling functions
         void OnInputUpdate(float deltaTime, int mods) override;
         void OnKeyPress(int key, int mods) override;
         void OnKeyRelease(int key, int mods) override;
@@ -28,6 +43,7 @@ namespace m1
         void OnWindowResize(int width, int height) override;
 
     protected:
+        // Transformation variables
         float cx, cy;
         glm::mat3 modelMatrix;
         float translateX, translateY;
@@ -35,6 +51,5 @@ namespace m1
         float angularStep;
 
         // TODO(student): If you need any other class variables, define them here.
-
     };
 }   // namespace m1
