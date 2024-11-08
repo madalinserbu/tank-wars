@@ -41,7 +41,7 @@ void Tema1::Init() {
     camera->SetRotation(glm::vec3(0, 0, 0));
     camera->Update();
 
-    int numPoints = 100;
+    int numPoints = 900;
     xStart = 0; // Pozi?ia de început pe axa X
     xEnd = (float)resolution.x; // Pozi?ia final? pe axa X
 
@@ -103,61 +103,57 @@ void Tema1::FrameStart() {
     glm::ivec2 resolution = window->GetResolution();
     glViewport(0, 0, resolution.x, resolution.y);
 }
+
 void Tema1::Update(float deltaTimeSeconds) {
+    // Definim un offset vertical pentru a ridica tancurile deasupra terenului
+    const float tankYOffset = 4.8f;  // Valoare ajustabil? pentru a ridica tancurile (în pixeli)
+
     // Reset?m modelMatrix pentru a începe o nou? randare
     modelMatrix = glm::mat3(1);
 
     // Red?m terenul
     RenderMesh2D(meshes["terrain"], shaders["VertexColor"], modelMatrix);
 
-    // Actualizarea pozi?iei tancului 1
+    // Actualizare pozi?ie ?i rota?ie tanc 1
     glm::mat3 tank1ModelMatrix = glm::mat3(1);
-
-    // Calcul?m indexul pentru tancul 1 pe harta de în?l?imi
     int indexTank1 = std::min(static_cast<int>((xPosTank1 - xStart) / (xEnd - xStart) * (heightMap.size() - 1)), static_cast<int>(heightMap.size() - 1));
-    float yPosTank1 = heightMap[indexTank1];  // Calcul?m în?l?imea corect? pe teren
+    float yPosTank1 = heightMap[indexTank1] + tankYOffset;  // Pozi?ia corect? pe teren pentru tanc 1, cu offset
 
-    // Pozi?ion?m tancul 1 pe teren
     tank1ModelMatrix *= transform2D::Translate(xPosTank1, yPosTank1);
 
-    // Calcul?m unghiul de rota?ie
-    float dx = 0.001f;  // Diferen?a pe axa X
-    float dy = heightMap[std::min(static_cast<size_t>((xPosTank1 + dx - xStart) / (xEnd - xStart) * (heightMap.size() - 1)), heightMap.size() - 1)] - yPosTank1; // Diferen?a pe axa Y
-    float angle = atan2(dy, dx);  // Calcul?m unghiul de rota?ie pe baza diferen?elor de în?l?ime
+    // Calcul?m panta terenului pentru a determina rota?ia corect?
+    float dx = 5.0f;  // Distan?? mai mare pentru o estimare mai bun? a pantei
+    int indexNextTank1 = std::min(indexTank1 + static_cast<int>(dx), static_cast<int>(heightMap.size() - 1));
+    float yNextPosTank1 = heightMap[indexNextTank1] + tankYOffset;  // În?l?imea la punctul urm?tor pentru panta
 
-    // Aplic?m rota?ia tancului
-    tank1ModelMatrix *= transform2D::Rotate(angle);
+    float angle = atan2(yNextPosTank1 - yPosTank1, dx);  // Calculul unghiului
+
+    tank1ModelMatrix *= transform2D::Rotate(angle);  // Rote?te tancul pe baza pantei terenului
 
     // Red?m tancul 1
     RenderMesh2D(meshes["tank1_base"], shaders["VertexColor"], tank1ModelMatrix);
     RenderMesh2D(meshes["tank1_turret"], shaders["VertexColor"], tank1ModelMatrix);
     RenderMesh2D(meshes["tank1_barrel"], shaders["VertexColor"], tank1ModelMatrix * transform2D::Translate(0, 20));
 
-    // Actualizarea pozi?iei tancului 2 (proces similar cu tancul 1)
+    // Actualizare pozi?ie ?i rota?ie tanc 2 (similar cu tanc 1)
     glm::mat3 tank2ModelMatrix = glm::mat3(1);
-
-    // Calcul?m indexul pentru tancul 2 pe harta de în?l?imi
     int indexTank2 = std::min(static_cast<int>((xPosTank2 - xStart) / (xEnd - xStart) * (heightMap.size() - 1)), static_cast<int>(heightMap.size() - 1));
-    float yPosTank2 = heightMap[indexTank2];  // Calcul?m în?l?imea corect? pe teren
+    float yPosTank2 = heightMap[indexTank2] + tankYOffset;  // Pozi?ia corect? pe teren pentru tanc 2, cu offset
 
-    // Pozi?ion?m tancul 2 pe teren
     tank2ModelMatrix *= transform2D::Translate(xPosTank2, yPosTank2);
 
-    // Calcul?m unghiul de rota?ie
-    float dx2 = 1.0f;  // Diferen?a pe axa X
-    float dy2 = heightMap[std::min(static_cast<int>((xPosTank2 + dx2 - xStart) / (xEnd - xStart) * (heightMap.size() - 1)), static_cast<int>(heightMap.size() - 1))] - yPosTank2;  // Diferen?a pe axa Y
-    float angle2 = atan2(dy2, dx2);  // Calcul?m unghiul de rota?ie pe baza diferen?elor de în?l?ime
+    int indexNextTank2 = std::min(indexTank2 + static_cast<int>(dx), static_cast<int>(heightMap.size() - 1));
+    float yNextPosTank2 = heightMap[indexNextTank2] + tankYOffset;
 
-    // Aplic?m rota?ia tancului
-    tank2ModelMatrix *= transform2D::Rotate(angle2);
+    float angle2 = atan2(yNextPosTank2 - yPosTank2, dx);  // Calculul unghiului pentru tancul 2
+
+    tank2ModelMatrix *= transform2D::Rotate(angle2);  // Rote?te tancul pe baza pantei terenului
 
     // Red?m tancul 2
     RenderMesh2D(meshes["tank2_base"], shaders["VertexColor"], tank2ModelMatrix);
     RenderMesh2D(meshes["tank2_turret"], shaders["VertexColor"], tank2ModelMatrix);
     RenderMesh2D(meshes["tank2_barrel"], shaders["VertexColor"], tank2ModelMatrix * transform2D::Translate(0, 20));
 }
-
-
 
 void Tema1::FrameEnd() {
 }
@@ -180,10 +176,10 @@ void Tema1::UpdateTankPosition() {
     }
 
     if (moveTank2Right) {
-        xPosTank2 += 10.0f;  // Move tank2 right
+        xPosTank2 += 1.0f;  // Move tank2 right
     }
     if (moveTank2Left) {
-        xPosTank2 -= 10.0f;  // Move tank2 left
+        xPosTank2 -= 1.0f;  // Move tank2 left
     }
 
     // Ensure tank2 stays within bounds
