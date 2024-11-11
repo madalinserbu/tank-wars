@@ -43,7 +43,7 @@ namespace object2D {
         int numSegments = 30;
         float radius = 10.0f;
         float angleStep = M_PI / numSegments; // Arc de cerc pe jum?tate
-        float offsetY = 13.0f;  // Offset vertical pentru a plasa turela deasupra trapezului superior
+        float offsetY = 12.50f;  // Offset vertical pentru a plasa turela deasupra trapezului superior
 
         // Adaug? centrul arcului cu translatare vertical?
         vertices.emplace_back(glm::vec3(0, offsetY, 0), color);

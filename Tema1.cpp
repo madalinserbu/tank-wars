@@ -80,11 +80,11 @@ void Tema1::Init() {
     std::vector<Mesh*> tank1Meshes;
     std::vector<Mesh*> tank2Meshes;
 
-    glm::vec3 camoBeigeDark = glm::vec3(0.76f, 0.69f, 0.50f);  
-    glm::vec3 camoGreenDark = glm::vec3(0.33f, 0.42f, 0.18f);  
+    glm::vec3 camoBeigeDark = glm::vec3(0.76f, 0.69f, 0.50f);
+    glm::vec3 camoGreenDark = glm::vec3(0.33f, 0.42f, 0.18f);
 
     // Creeaz? primul tanc
-    object2D::CreateTank("tank1",  camoBeigeDark, camoBeigeDark, tank1Meshes);
+    object2D::CreateTank("tank1", camoBeigeDark, camoBeigeDark, tank1Meshes);
     for (auto& mesh : tank1Meshes) {
         AddMeshToList(mesh);
     }
@@ -133,7 +133,6 @@ void Tema1::Update(float deltaTimeSeconds) {
     // Red?m tancul 1
     RenderMesh2D(meshes["tank1_base"], shaders["VertexColor"], tank1ModelMatrix);
     RenderMesh2D(meshes["tank1_turret"], shaders["VertexColor"], tank1ModelMatrix);
-    RenderMesh2D(meshes["tank1_barrel"], shaders["VertexColor"], tank1ModelMatrix * transform2D::Translate(0, 20));
 
     // Actualizare pozi?ie ?i rota?ie tanc 2 (similar cu tanc 1)
     glm::mat3 tank2ModelMatrix = glm::mat3(1);
@@ -152,7 +151,20 @@ void Tema1::Update(float deltaTimeSeconds) {
     // Red?m tancul 2
     RenderMesh2D(meshes["tank2_base"], shaders["VertexColor"], tank2ModelMatrix);
     RenderMesh2D(meshes["tank2_turret"], shaders["VertexColor"], tank2ModelMatrix);
-    RenderMesh2D(meshes["tank2_barrel"], shaders["VertexColor"], tank2ModelMatrix * transform2D::Translate(0, 20));
+    // Render tank 1's barrel with rotation
+    RenderMesh2D(
+        meshes["tank1_barrel"],
+        shaders["VertexColor"],
+        tank1ModelMatrix * transform2D::Translate(0, 20) * transform2D::Rotate(barrelAngleTank1)
+    );
+
+    // Render tank 2's barrel with rotation
+    RenderMesh2D(
+        meshes["tank2_barrel"],
+        shaders["VertexColor"],
+        tank2ModelMatrix * transform2D::Translate(0, 20) * transform2D::Rotate(barrelAngleTank2)
+    );
+
 }
 
 void Tema1::FrameEnd() {
@@ -219,6 +231,24 @@ void Tema1::OnKeyPress(int key, int mods) {
     // Asigur?-te c? tancul 2 nu dep??e?te limitele feronavei
     if (xPosTank2 < 0) xPosTank2 = 0;
     else if (xPosTank2 > window->GetResolution().x) xPosTank2 = window->GetResolution().x;
+
+    if (key == GLFW_KEY_W) {
+        // Rotate barrel of tank 1 upwards
+        barrelAngleTank1 += barrelRotationSpeed;
+    }
+    if (key == GLFW_KEY_S) {
+        // Rotate barrel of tank 1 downwards
+        barrelAngleTank1 -= barrelRotationSpeed;
+    }
+    if (key == GLFW_KEY_UP) {
+        // Rotate barrel of tank 2 upwards
+        barrelAngleTank2 += barrelRotationSpeed;
+    }
+    if (key == GLFW_KEY_DOWN) {
+        // Rotate barrel of tank 2 downwards
+        barrelAngleTank2 -= barrelRotationSpeed;
+    }
+
 }
 
 
@@ -265,6 +295,20 @@ void Tema1::OnInputUpdate(float deltaTime, int mods) {
 
     if (xPosTank2 < 0) xPosTank2 = 0;
     if (xPosTank2 > window->GetResolution().x) xPosTank2 = window->GetResolution().x;
+
+    if (window->KeyHold(GLFW_KEY_W)) {
+        barrelAngleTank1 += barrelRotationSpeed * deltaTime;
+    }
+    if (window->KeyHold(GLFW_KEY_S)) {
+        barrelAngleTank1 -= barrelRotationSpeed * deltaTime;
+    }
+    if (window->KeyHold(GLFW_KEY_UP)) {
+        barrelAngleTank2 += barrelRotationSpeed * deltaTime;
+    }
+    if (window->KeyHold(GLFW_KEY_DOWN)) {
+        barrelAngleTank2 -= barrelRotationSpeed * deltaTime;
+    }
+
 }
 
 
