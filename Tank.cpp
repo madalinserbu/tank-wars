@@ -7,25 +7,22 @@ using namespace std;
 
 namespace object2D {
 
-    // Func?ie pentru a crea baza tancului din dou? trapeze suprapuse
+    // Creez baza tancului din doua trapeze suprapuse
     Mesh* CreateTankBase(const std::string& name, const glm::vec3& color) {
         std::vector<VertexFormat> vertices;
         std::vector<unsigned int> indices;
 
-        // Trapez de jos (mai mic, scalat p?strând raportul dimensiunilor)
-        vertices.emplace_back(glm::vec3(-20 * 0.75, -8 * 0.75, 0), color - 0.15f);  // Stânga jos - baza mic? scalat?
-        vertices.emplace_back(glm::vec3(20 * 0.75, -8 * 0.75, 0), color - 0.15f);   // Dreapta jos - baza mic? scalat?
-        vertices.emplace_back(glm::vec3(30 * 0.75, 0 * 0.75, 0), color - 0.15f);     // Dreapta sus - baza mare scalat?
-        vertices.emplace_back(glm::vec3(-30 * 0.75, 0 * 0.75, 0), color - 0.15f);    // Stânga sus - baza mare scalat?
+        // Trapez de jos
+        vertices.emplace_back(glm::vec3(-20 * 0.75, -8 * 0.75, 0), color - 0.15f);  // Stânga jos - baza mica
+        vertices.emplace_back(glm::vec3(20 * 0.75, -8 * 0.75, 0), color - 0.15f);   // Dreapta jos - baza mica
+        vertices.emplace_back(glm::vec3(30 * 0.75, 0 * 0.75, 0), color - 0.15f);     // Dreapta sus - baza mare
+        vertices.emplace_back(glm::vec3(-30 * 0.75, 0 * 0.75, 0), color - 0.15f);    // Stânga sus - baza mare
 
-        // Trapez de sus (mai mare, dar p?strând raportul cu cel de jos)
-        vertices.emplace_back(glm::vec3(-45 * 0.75, 0 * 0.75, 0), color);    // Stânga jos - baza mare scalat?
-        vertices.emplace_back(glm::vec3(45 * 0.75, 0 * 0.75, 0), color);     // Dreapta jos - baza mare scalat?
-        vertices.emplace_back(glm::vec3(31 * 0.75, 17 * 0.75, 0), color);    // Dreapta sus - baza mic? scalat?
-        vertices.emplace_back(glm::vec3(-31 * 0.75, 17 * 0.75, 0), color);   // Stânga sus - baza mic? scalat?
-
-
-
+        // Trapez de sus
+        vertices.emplace_back(glm::vec3(-45 * 0.75, 0 * 0.75, 0), color);    // Stânga jos - baza mare
+        vertices.emplace_back(glm::vec3(45 * 0.75, 0 * 0.75, 0), color);     // Dreapta jos - baza mare
+        vertices.emplace_back(glm::vec3(31 * 0.75, 17 * 0.75, 0), color);    // Dreapta sus - baza mica
+        vertices.emplace_back(glm::vec3(-31 * 0.75, 17 * 0.75, 0), color);   // Stânga sus - baza mica
 
         // Indici pentru formarea trapezelor
         indices = { 0, 1, 2, 2, 3, 0, 4, 5, 6, 6, 7, 4 };
@@ -35,20 +32,20 @@ namespace object2D {
         return tankBase;
     }
 
-    // Func?ie pentru a crea turela tancului ca arc de cerc ?i a-l pozi?iona deasupra trapezului superior
+    // Creez turela tancului ca arc de cerc si il pozitionez deasupra trapezului superior
     Mesh* CreateTankTurret(const std::string& name, const glm::vec3& color) {
         std::vector<VertexFormat> vertices;
         std::vector<unsigned int> indices;
 
         int numSegments = 30;
         float radius = 10.0f;
-        float angleStep = M_PI / numSegments; // Arc de cerc pe jum?tate
+        float angleStep = M_PI / numSegments; // Arc de cerc pe jumatate
         float offsetY = 12.50f;  // Offset vertical pentru a plasa turela deasupra trapezului superior
 
-        // Adaug? centrul arcului cu translatare vertical?
+        // Adaug centrul arcului
         vertices.emplace_back(glm::vec3(0, offsetY, 0), color);
 
-        // Adaug? vertex-urile arcului de cerc, cu translatare vertical?
+        // Adaug vertex-urile arcului de cerc
         for (int i = 0; i <= numSegments; ++i) {
             float angle = i * angleStep;
             vertices.emplace_back(glm::vec3(radius * cos(angle), offsetY + radius * sin(angle), 0), color);
@@ -65,7 +62,7 @@ namespace object2D {
     }
 
 
-    // Func?ie pentru ?eava tunului tancului, un dreptunghi alungit
+    // Creez teava tunului tancului ca un dreptunghi alungit
     Mesh* CreateTankBarrel(const std::string& name, const glm::vec3& color) {
         std::vector<VertexFormat> vertices = {
             VertexFormat(glm::vec3(-1.5, 0, 0), color),
@@ -81,7 +78,7 @@ namespace object2D {
         return barrel;
     }
 
-    // Func?ie principal? pentru a crea un tanc complet
+	// Creez un tanc complet (baza, turela si teava)
     void CreateTank(const std::string& name, const glm::vec3& baseColor, const glm::vec3& turretColor, std::vector<Mesh*>& meshes) {
         // Baza tancului
         meshes.push_back(CreateTankBase(name + "_base", baseColor));
@@ -93,7 +90,7 @@ namespace object2D {
         meshes.push_back(CreateTankBarrel(name + "_barrel", glm::vec3(0.0f, 0.0f, 0.0f)));
     }
 
-    // Func?ie pentru a crea un proiectil (disc de cerc)
+	// Creez un proiectil ca un cerc
     Mesh* CreateProjectile(const std::string& name, float radius, const glm::vec3& color) {
         std::vector<VertexFormat> vertices;
         std::vector<unsigned int> indices;

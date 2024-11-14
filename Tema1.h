@@ -14,6 +14,12 @@ namespace m1
         // Initialization and update functions
         void Init() override;
         void UpdateTankPosition();
+        struct Projectile {
+            glm::vec2 position;
+            glm::vec2 velocity;
+            float lifetime;
+        };
+
 
     private:
         float yPosTank1, yNextPosTank1, dx, yNextPosTank2, yPosTank2;
@@ -31,20 +37,17 @@ namespace m1
         bool moveTank2Left = false;
         float barrelAngleTank1 = 0.0f;
         float barrelAngleTank2 = 0.0f;
-        const float barrelRotationSpeed = 1.5f; // Adjust rotation speed
+        const float barrelRotationSpeed = 1.5f;
+
+        std::vector<Projectile> tank1Projectiles;
+        std::vector<Projectile> tank2Projectiles;
+        const float projectileSpeed = 250.0f;
+        const float gravity = -300.0f;
+        const float projectileLifetime = 3.0f; // Seconds
 
 
         // Height map data for terrain
         std::vector<float> heightMap;
-        struct Projectile {
-            glm::vec2 position;
-            glm::vec2 velocity;
-            bool active;
-        };
-
-        Projectile projectile;
-        float gravity = 9.8f;  // Sau orice alt? valoare potrivit?
-
 
         // Input handling functions
         void OnInputUpdate(float deltaTime, int mods) override;

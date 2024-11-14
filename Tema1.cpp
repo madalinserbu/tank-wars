@@ -94,6 +94,7 @@ void Tema1::Init() {
     for (auto& mesh : tank2Meshes) {
         AddMeshToList(mesh);
     }
+
 }
 
 void Tema1::FrameStart() {
@@ -232,40 +233,23 @@ void Tema1::OnKeyPress(int key, int mods) {
     if (xPosTank2 < 0) xPosTank2 = 0;
     else if (xPosTank2 > window->GetResolution().x) xPosTank2 = window->GetResolution().x;
 
-    if (key == GLFW_KEY_W) {
-        // Rotate barrel of tank 1 upwards
-        barrelAngleTank1 += barrelRotationSpeed;
-    }
-    if (key == GLFW_KEY_S) {
-        // Rotate barrel of tank 1 downwards
-        barrelAngleTank1 -= barrelRotationSpeed;
-    }
-    if (key == GLFW_KEY_UP) {
-        // Rotate barrel of tank 2 upwards
-        barrelAngleTank2 += barrelRotationSpeed;
-    }
-    if (key == GLFW_KEY_DOWN) {
-        // Rotate barrel of tank 2 downwards
-        barrelAngleTank2 -= barrelRotationSpeed;
-    }
-
 }
 
 
 void Tema1::OnKeyRelease(int key, int mods) {
     // Check for key release events
-    if (key == GLFW_KEY_RIGHT) {
+    if (key == GLFW_KEY_D) {
         moveTank1Right = false;
     }
-    if (key == GLFW_KEY_LEFT) {
+    if (key == GLFW_KEY_A) {
         moveTank1Left = false;
     }
 
     // Same for tank2
-    if (key == GLFW_KEY_D) {
+    if (key == GLFW_KEY_RIGHT) {
         moveTank2Right = false;
     }
-    if (key == GLFW_KEY_A) {
+    if (key == GLFW_KEY_LEFT) {
         moveTank2Left = false;
     }
 }
@@ -289,23 +273,23 @@ void Tema1::OnInputUpdate(float deltaTime, int mods) {
         xPosTank2 -= moveSpeed * deltaTime;
     }
 
-    // Asigur?-te c? tancurile nu ies din limitele feronavei
+    // Tancurile nu ies din limitele ferestrei
     if (xPosTank1 < 0) xPosTank1 = 0;
     if (xPosTank1 > window->GetResolution().x) xPosTank1 = window->GetResolution().x;
 
     if (xPosTank2 < 0) xPosTank2 = 0;
     if (xPosTank2 > window->GetResolution().x) xPosTank2 = window->GetResolution().x;
 
-    if (window->KeyHold(GLFW_KEY_W)) {
+    if (window->KeyHold(GLFW_KEY_UP)) {
         barrelAngleTank1 += barrelRotationSpeed * deltaTime;
     }
-    if (window->KeyHold(GLFW_KEY_S)) {
+    if (window->KeyHold(GLFW_KEY_DOWN)) {
         barrelAngleTank1 -= barrelRotationSpeed * deltaTime;
     }
-    if (window->KeyHold(GLFW_KEY_UP)) {
+    if (window->KeyHold(GLFW_KEY_S)) {
         barrelAngleTank2 += barrelRotationSpeed * deltaTime;
     }
-    if (window->KeyHold(GLFW_KEY_DOWN)) {
+    if (window->KeyHold(GLFW_KEY_W)) {
         barrelAngleTank2 -= barrelRotationSpeed * deltaTime;
     }
 
