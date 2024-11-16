@@ -95,6 +95,9 @@ void Tema1::Init() {
         AddMeshToList(mesh);
     }
 
+    Mesh* projectileMesh = object2D::CreateProjectile("projectile", 5.0f, glm::vec3(0.7f, 0.2f, 0.2f));
+    AddMeshToList(projectileMesh);
+
 }
 
 void Tema1::FrameStart() {
@@ -107,7 +110,7 @@ void Tema1::FrameStart() {
 
 void Tema1::Update(float deltaTimeSeconds) {
     // Definim un offset vertical pentru a ridica tancurile deasupra terenului
-    const float tankYOffset = 4.8f;  // Valoare ajustabil? pentru a ridica tancurile (în pixeli)
+
 
     // Reset?m modelMatrix pentru a începe o nou? randare
     modelMatrix = glm::mat3(1);
@@ -118,14 +121,14 @@ void Tema1::Update(float deltaTimeSeconds) {
     // Actualizare pozi?ie ?i rota?ie tanc 1
     glm::mat3 tank1ModelMatrix = glm::mat3(1);
     int indexTank1 = std::min(static_cast<int>((xPosTank1 - xStart) / (xEnd - xStart) * (heightMap.size() - 1)), static_cast<int>(heightMap.size() - 1));
-    float yPosTank1 = heightMap[indexTank1] + tankYOffset;  // Pozi?ia corect? pe teren pentru tanc 1, cu offset
+    float yPosTank1 = heightMap[indexTank1] + 5.0f;  // Pozi?ia corect? pe teren pentru tanc 1, cu offset
 
     tank1ModelMatrix *= transform2D::Translate(xPosTank1, yPosTank1);
 
     // Calcul?m panta terenului pentru a determina rota?ia corect?
     float dx = 5.0f;  // Distan?? mai mare pentru o estimare mai bun? a pantei
     int indexNextTank1 = std::min(indexTank1 + static_cast<int>(dx), static_cast<int>(heightMap.size() - 1));
-    float yNextPosTank1 = heightMap[indexNextTank1] + tankYOffset;  // În?l?imea la punctul urm?tor pentru panta
+    float yNextPosTank1 = heightMap[indexNextTank1] + 5.0f;  // În?l?imea la punctul urm?tor pentru panta
 
     float angle = atan2(yNextPosTank1 - yPosTank1, dx);  // Calculul unghiului
 
@@ -138,12 +141,12 @@ void Tema1::Update(float deltaTimeSeconds) {
     // Actualizare pozi?ie ?i rota?ie tanc 2 (similar cu tanc 1)
     glm::mat3 tank2ModelMatrix = glm::mat3(1);
     int indexTank2 = std::min(static_cast<int>((xPosTank2 - xStart) / (xEnd - xStart) * (heightMap.size() - 1)), static_cast<int>(heightMap.size() - 1));
-    float yPosTank2 = heightMap[indexTank2] + tankYOffset;  // Pozi?ia corect? pe teren pentru tanc 2, cu offset
+    float yPosTank2 = heightMap[indexTank2] + 5.0f;  // Pozi?ia corect? pe teren pentru tanc 2, cu offset
 
     tank2ModelMatrix *= transform2D::Translate(xPosTank2, yPosTank2);
 
     int indexNextTank2 = std::min(indexTank2 + static_cast<int>(dx), static_cast<int>(heightMap.size() - 1));
-    float yNextPosTank2 = heightMap[indexNextTank2] + tankYOffset;
+    float yNextPosTank2 = heightMap[indexNextTank2] + 5.0f;
 
     float angle2 = atan2(yNextPosTank2 - yPosTank2, dx);  // Calculul unghiului pentru tancul 2
 
@@ -165,6 +168,40 @@ void Tema1::Update(float deltaTimeSeconds) {
         shaders["VertexColor"],
         tank2ModelMatrix * transform2D::Translate(0, 20) * transform2D::Rotate(barrelAngleTank2)
     );
+
+    // Update and render Tank 1's projectiles
+    for (auto it = tank1Projectiles.begin(); it != tank1Projectiles.end(); ) {
+        it->velocity.y += gravity * deltaTimeSeconds; // Apply gravity
+        it->position += it->velocity * deltaTimeSeconds;
+        it->lifetime -= deltaTimeSeconds;
+
+        if (it->lifetime <= 0 || it->position.y < 0) {
+            it = tank1Projectiles.erase(it); // Remove if out of lifespan or below terrain
+        }
+        else {
+            glm::mat3 projectileModelMatrix = glm::mat3(1);
+            projectileModelMatrix *= transform2D::Translate(it->position.x, it->position.y);
+            RenderMesh2D(meshes["projectile"], shaders["VertexColor"], projectileModelMatrix);
+            ++it;
+        }
+    }
+
+    // Update and render Tank 2's projectiles
+    for (auto it = tank2Projectiles.begin(); it != tank2Projectiles.end(); ) {
+        it->velocity.y += gravity * deltaTimeSeconds; // Apply gravity
+        it->position += it->velocity * deltaTimeSeconds;
+        it->lifetime -= deltaTimeSeconds;
+
+        if (it->lifetime <= 0 || it->position.y < 0) {
+            it = tank2Projectiles.erase(it); // Remove if out of lifespan or below terrain
+        }
+        else {
+            glm::mat3 projectileModelMatrix = glm::mat3(1);
+            projectileModelMatrix *= transform2D::Translate(it->position.x, it->position.y);
+            RenderMesh2D(meshes["projectile"], shaders["VertexColor"], projectileModelMatrix);
+            ++it;
+        }
+    }
 
 }
 
@@ -232,6 +269,32 @@ void Tema1::OnKeyPress(int key, int mods) {
     // Asigur?-te c? tancul 2 nu dep??e?te limitele feronavei
     if (xPosTank2 < 0) xPosTank2 = 0;
     else if (xPosTank2 > window->GetResolution().x) xPosTank2 = window->GetResolution().x;
+
+    if (key == GLFW_KEY_SPACE) { // Launch for Tank 1
+        // Determine the position of the barrel's end
+        glm::vec2 tank1Position(xPosTank1, heightMap[std::min(static_cast<int>((xPosTank1 - xStart) / (xEnd - xStart) * (heightMap.size() - 1)), static_cast<int>(heightMap.size() - 1))] + 5.0f);
+
+        // Calculate direction based on turret orientation
+        glm::vec2 direction(cos(barrelAngleTank1 + 90.0f), sin(barrelAngleTank1 + 90.0f));
+
+        // Adjust starting position based on barrel length (replace barrelLength with actual length)
+        glm::vec2 startPosition = tank1Position + direction * 40.0f;
+
+        // Set up the projectile's initial properties
+        Projectile projectile = { startPosition, direction * projectileSpeed, projectileLifetime };
+        tank1Projectiles.push_back(projectile);
+    }
+
+    if (key == GLFW_KEY_ENTER) { // Launch for Tank 2
+        glm::vec2 tank2Position(xPosTank2, heightMap[std::min(static_cast<int>((xPosTank2 - xStart) / (xEnd - xStart) * (heightMap.size() - 1)), static_cast<int>(heightMap.size() - 1))] + 5.0f);
+
+        glm::vec2 direction(cos(barrelAngleTank2 + 45.0f), sin(barrelAngleTank2 + 45.0f));
+        glm::vec2 startPosition = tank2Position + direction * 40.0f;
+
+        Projectile projectile = { startPosition, direction * projectileSpeed, projectileLifetime };
+        tank2Projectiles.push_back(projectile);
+    }
+
 
 }
 

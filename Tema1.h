@@ -35,19 +35,24 @@ namespace m1
         bool moveTank1Left = false;
         bool moveTank2Right = false;
         bool moveTank2Left = false;
-        float barrelAngleTank1 = 0.0f;
-        float barrelAngleTank2 = 0.0f;
+        float barrelAngleTank1 = 5.0f;
+        float barrelAngleTank2 = -5.0f;
         const float barrelRotationSpeed = 1.5f;
 
         std::vector<Projectile> tank1Projectiles;
         std::vector<Projectile> tank2Projectiles;
-        const float projectileSpeed = 250.0f;
-        const float gravity = -300.0f;
+        const float projectileSpeed = 300.0f;
+        const float gravity = -500.0f;
         const float projectileLifetime = 3.0f; // Seconds
+        const float tankYOffset = 4.8f;
 
 
         // Height map data for terrain
         std::vector<float> heightMap;
+
+        float tank1Health = 100;
+        float tank2Health = 100;
+        const float damageValue = 20;
 
         // Input handling functions
         void OnInputUpdate(float deltaTime, int mods) override;
